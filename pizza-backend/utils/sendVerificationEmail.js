@@ -28,7 +28,7 @@ const sendVerificationEmail = async (email, token) => {
         `,
     });
 
-    return {};
+    return { previewUrl: verificationLink };
 };
 
 module.exports = sendVerificationEmail;

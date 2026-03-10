@@ -2,8 +2,7 @@ const nodemailer = require("nodemailer");
 
 const sendPasswordResetEmail = async (email, resetUrl) => {
     if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS || process.env.EMAIL_PASS === "YOUR_16_CHAR_APP_PASSWORD") {
-        console.log(`Password reset link for ${email}: ${resetUrl}`);
-        return { previewUrl: resetUrl };
+        throw new Error("Email service is not configured. Set EMAIL_USER and EMAIL_PASS with a valid Gmail app password.");
     }
 
     const transporter = nodemailer.createTransport({
@@ -26,7 +25,7 @@ const sendPasswordResetEmail = async (email, resetUrl) => {
         `,
     });
 
-    return {};
+    return { delivered: true };
 };
 
 module.exports = sendPasswordResetEmail;

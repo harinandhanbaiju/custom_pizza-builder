@@ -1,12 +1,10 @@
 import React, { useEffect, useMemo, useState } from "react";
 import {
     forgotPassword,
-    devVerifyEmail,
     loginAdmin,
     loginUser,
     registerAdmin,
     registerUser,
-    resendVerification,
     resetPassword,
     verifyEmail,
 } from "../services/authService";
@@ -39,7 +37,6 @@ const AuthPanel = () => {
         return "";
     });
     const [isLoading, setIsLoading] = useState(false);
-    const [needsVerification, setNeedsVerification] = useState(false);
 
     useEffect(() => {
         const path = window.location.pathname;
@@ -89,7 +86,6 @@ const AuthPanel = () => {
 
     const switchMode = (nextMode) => {
         clearFeedback();
-        setNeedsVerification(false);
         setMode(nextMode);
     };
 
@@ -98,7 +94,6 @@ const AuthPanel = () => {
 
         try {
             setIsLoading(true);
-            setNeedsVerification(false);
             clearFeedback();
 
             if (mode === "user-register" || mode === "admin-register") {
@@ -126,11 +121,6 @@ const AuthPanel = () => {
             if (mode === "forgot-password") {
                 const response = await forgotPassword(email);
                 setStatusMessage(response.message || "Password reset email sent");
-
-                if (response.resetPreviewUrl) {
-                    setStatusMessage(response.message || "Password reset email sent");
-                    setStatusLink(response.resetPreviewUrl);
-                }
                 return;
             }
 
@@ -152,42 +142,7 @@ const AuthPanel = () => {
             setStatusMessage("Login successful");
             setPassword("");
         } catch (error) {
-            if ((error.message || "").toLowerCase().includes("verify your email")) {
-                setNeedsVerification(true);
-            }
             setErrorMessage(error.message || "Authentication request failed");
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const handleResendVerification = async () => {
-        try {
-            setIsLoading(true);
-            clearFeedback();
-            const response = await resendVerification(email);
-            setStatusMessage(response.message || "Verification email sent");
-
-            if (response.verificationPreviewUrl) {
-                setStatusMessage(response.message || "Verification email sent");
-                setStatusLink(response.verificationPreviewUrl);
-            }
-        } catch (error) {
-            setErrorMessage(error.message || "Failed to resend verification email");
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const handleDevVerify = async () => {
-        try {
-            setIsLoading(true);
-            clearFeedback();
-            const response = await devVerifyEmail(email);
-            setStatusMessage(response.message || "Account verified in development mode");
-            setNeedsVerification(false);
-        } catch (error) {
-            setErrorMessage(error.message || "Failed to verify in development mode");
         } finally {
             setIsLoading(false);
         }
@@ -200,18 +155,6 @@ const AuthPanel = () => {
                 <p>Role: <strong>{user.role || (user.isAdmin ? "admin" : "user")}</strong></p>
                 <p>Status: <strong>{user.isVerified ? "Verified" : "Unverified"}</strong></p>
                 <button type="button" onClick={logout}>Logout</button>
-            </section>
-        );
-    }
-
-    if (mode === "verify-email") {
-        return (
-            <section className="auth-panel">
-                <h2>Email Verification</h2>
-                {statusMessage && <p>{statusMessage}</p>}
-                {errorMessage && <p>{errorMessage}</p>}
-                {!statusMessage && !errorMessage && <p>Verifying your email...</p>}
-                <button type="button" onClick={() => switchMode("user-login")}>Back to Login</button>
             </section>
         );
     }
@@ -232,7 +175,7 @@ const AuthPanel = () => {
             {statusLink && (
                 <p>
                     <a href={statusLink} target="_blank" rel="noreferrer">
-                        Open link
+                        Open verification link
                     </a>
                 </p>
             )}
@@ -300,17 +243,6 @@ const AuthPanel = () => {
             <button type="submit" disabled={isLoading}>
                 {isLoading ? "Processing..." : "Submit"}
             </button>
-
-            {needsVerification && (
-                <div className="verify-actions">
-                    <button type="button" onClick={handleResendVerification} disabled={isLoading}>
-                        Resend Verification Email
-                    </button>
-                    <button type="button" onClick={handleDevVerify} disabled={isLoading}>
-                        Verify (Dev Only)
-                    </button>
-                </div>
-            )}
 
             {isAdminMode && <p>Admin mode is active.</p>}
         </form>

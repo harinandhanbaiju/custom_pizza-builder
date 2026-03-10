@@ -19,7 +19,9 @@ export const seedInventory = async () => {
 };
 
 export const getInventory = async () => {
-    const response = await fetch(`${API_BASE_URL}/inventory`);
+    const response = await fetch(`${API_BASE_URL}/inventory`, {
+        cache: "no-store",
+    });
     const data = await response.json();
 
     if (!response.ok) {

@@ -6,6 +6,7 @@ import AuthPanel from "./components/AuthPanel";
 import PizzaDashboard from "./components/PizzaDashboard";
 import { useAuth } from "./context/AuthContext";
 import AdminInventoryManager from "./components/AdminInventoryManager";
+import OvenRushHomeChrome from "./components/OvenRushHomeChrome";
 
 const AuthenticatedArea = () => {
     const { user } = useAuth();
@@ -27,8 +28,11 @@ const App = () => {
     return (
         <AuthProvider>
             <PizzaBuilderProvider>
-                <AuthPanel />
-                <AuthenticatedArea />
+                <div className="app-shell">
+                    <OvenRushHomeChrome />
+                    <AuthPanel />
+                    <AuthenticatedArea />
+                </div>
             </PizzaBuilderProvider>
         </AuthProvider>
     );

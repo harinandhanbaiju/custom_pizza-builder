@@ -5,7 +5,6 @@ const {
 	registerAdmin,
 	verifyUserEmail,
 	resendVerification,
-	devVerifyEmail,
 	loginUser,
 	loginAdmin,
 	forgotPassword,
@@ -29,7 +28,6 @@ router.post("/admin/login", loginAdmin);
 router.post("/forgot-password", forgotPassword);
 router.post("/reset-password/:token", resetPassword);
 router.post("/resend-verification", resendVerification);
-router.post("/dev/verify-email", devVerifyEmail);
 router.get("/verify-email/:token", verifyUserEmail);
 
 // Backwards-compatible alias

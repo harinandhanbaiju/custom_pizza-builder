@@ -47,6 +47,12 @@ const AdminInventoryManager = () => {
 
     useEffect(() => {
         loadInventory();
+
+        const intervalId = setInterval(() => {
+            loadInventory();
+        }, 10000);
+
+        return () => clearInterval(intervalId);
     }, []);
 
     const allItems = useMemo(() => {

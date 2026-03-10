@@ -26,13 +26,19 @@ const parseApiResponse = async (response) => {
 };
 
 const postJson = async (url, payload) => {
-    const response = await fetch(url, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-    });
+    let response;
+
+    try {
+        response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+        });
+    } catch (error) {
+        throw new Error("Backend server is not reachable at http://localhost:5000. Start backend and try again.");
+    }
 
     return parseApiResponse(response);
 };
@@ -66,20 +72,22 @@ export const resendVerification = async (email) => {
     return postJson(`${API_BASE_URL}/users/resend-verification`, { email });
 };
 
-export const devVerifyEmail = async (email) => {
-    return postJson(`${API_BASE_URL}/users/dev/verify-email`, { email });
-};
-
 export const resetPassword = async (token, password) => {
     return postJson(`${API_BASE_URL}/users/reset-password/${token}`, { password });
 };
 
 export const getUserProfile = async (token) => {
-    const response = await fetch(`${API_BASE_URL}/users/profile`, {
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
-    });
+    let response;
+
+    try {
+        response = await fetch(`${API_BASE_URL}/users/profile`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+    } catch (error) {
+        throw new Error("Backend server is not reachable at http://localhost:5000. Start backend and try again.");
+    }
 
     return parseApiResponse(response);
 };

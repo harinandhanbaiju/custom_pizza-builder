@@ -39,17 +39,6 @@ const ensureValidRegistrationInput = ({ name, email, password }) => {
     return null;
 };
 
-const issueVerificationToken = () => {
-    const rawToken = crypto.randomBytes(32).toString("hex");
-    const hashedToken = crypto.createHash("sha256").update(rawToken).digest("hex");
-
-    return {
-        rawToken,
-        hashedToken,
-        expiresAt: new Date(Date.now() + VERIFICATION_TOKEN_TTL_MS),
-    };
-};
-
 const issueResetToken = () => {
     const rawToken = crypto.randomBytes(32).toString("hex");
     const hashedToken = crypto.createHash("sha256").update(rawToken).digest("hex");
@@ -58,6 +47,17 @@ const issueResetToken = () => {
         rawToken,
         hashedToken,
         expiresAt: new Date(Date.now() + RESET_TOKEN_TTL_MS),
+    };
+};
+
+const issueVerificationToken = () => {
+    const rawToken = crypto.randomBytes(32).toString("hex");
+    const hashedToken = crypto.createHash("sha256").update(rawToken).digest("hex");
+
+    return {
+        rawToken,
+        hashedToken,
+        expiresAt: new Date(Date.now() + VERIFICATION_TOKEN_TTL_MS),
     };
 };
 
@@ -72,6 +72,11 @@ const registerAccount = async (req, res, targetRole) => {
         }
 
         const normalizedEmail = normalizeEmail(email);
+
+        if (!EMAIL_REGEX.test(normalizedEmail)) {
+            return res.status(400).json({ message: "Please provide a valid email" });
+        }
+
         const userExists = await User.findOne({ email: normalizedEmail });
 
         if (userExists) {
@@ -107,6 +112,71 @@ const registerAccount = async (req, res, targetRole) => {
             email: user.email,
             role: user.role,
             requiresEmailVerification: true,
+            ...(mailResult.previewUrl ? { verificationPreviewUrl: mailResult.previewUrl } : {}),
+        });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Verify user email
+// @route   GET /api/users/verify-email/:token
+// @access  Public
+const verifyUserEmail = async (req, res) => {
+    try {
+        const { token } = req.params;
+        const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+
+        const user = await User.findOne({
+            verificationToken: hashedToken,
+            verificationTokenExpire: { $gt: new Date() },
+        });
+
+        if (!user) {
+            return res.status(400).json({ message: "Invalid or expired verification token" });
+        }
+
+        user.isVerified = true;
+        user.verificationToken = undefined;
+        user.verificationTokenExpire = undefined;
+        await user.save();
+
+        return res.status(200).json({ message: "Email verified successfully. You can now log in." });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Resend verification email
+// @route   POST /api/users/resend-verification
+// @access  Public
+const resendVerification = async (req, res) => {
+    try {
+        const normalizedEmail = normalizeEmail(req.body.email);
+
+        if (!EMAIL_REGEX.test(normalizedEmail)) {
+            return res.status(400).json({ message: "Please provide a valid email" });
+        }
+
+        const user = await User.findOne({ email: normalizedEmail });
+
+        if (!user) {
+            return res.status(200).json({ message: "If your account exists, a verification email has been sent" });
+        }
+
+        if (user.isVerified) {
+            return res.status(200).json({ message: "User is already verified" });
+        }
+
+        const verificationToken = issueVerificationToken();
+        user.verificationToken = verificationToken.hashedToken;
+        user.verificationTokenExpire = verificationToken.expiresAt;
+        await user.save();
+
+        const mailResult = await sendVerificationEmail(user.email, verificationToken.rawToken);
+
+        return res.status(200).json({
+            message: "Verification email sent again",
             ...(mailResult.previewUrl ? { verificationPreviewUrl: mailResult.previewUrl } : {}),
         });
     } catch (error) {
@@ -157,100 +227,6 @@ const registerAdmin = async (req, res) => {
     return registerAccount(req, res, "admin");
 };
 
-// @desc    Verify user email
-// @route   GET /api/users/verify-email/:token
-// @access  Public
-const verifyUserEmail = async (req, res) => {
-    try {
-        const { token } = req.params;
-        const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
-
-        const user = await User.findOne({
-            verificationToken: hashedToken,
-            verificationTokenExpire: { $gt: new Date() },
-        });
-
-        if (!user) {
-            return res.status(400).json({ message: "Invalid or expired verification token" });
-        }
-
-        user.isVerified = true;
-        user.verificationToken = undefined;
-        user.verificationTokenExpire = undefined;
-        await user.save();
-
-        return res.status(200).json({ message: "Email verified successfully. You can now log in." });
-    } catch (error) {
-        return res.status(500).json({ message: error.message });
-    }
-};
-
-// @desc    Resend verification email
-// @route   POST /api/users/resend-verification
-// @access  Public
-const resendVerification = async (req, res) => {
-    try {
-        const { email } = req.body;
-
-        const normalizedEmail = normalizeEmail(email);
-
-        if (!EMAIL_REGEX.test(normalizedEmail)) {
-            return res.status(400).json({ message: "Please provide a valid email" });
-        }
-
-        const user = await User.findOne({ email: normalizedEmail });
-
-        if (!user) {
-            return res.status(200).json({ message: "If your account exists, a verification email has been sent" });
-        }
-
-        if (user.isVerified) {
-            return res.status(200).json({ message: "User is already verified" });
-        }
-
-        const verificationToken = issueVerificationToken();
-        user.verificationToken = verificationToken.hashedToken;
-        user.verificationTokenExpire = verificationToken.expiresAt;
-        await user.save();
-
-        const mailResult = await sendVerificationEmail(user.email, verificationToken.rawToken);
-
-        return res.status(200).json({
-            message: "Verification email sent again",
-            ...(mailResult.previewUrl ? { verificationPreviewUrl: mailResult.previewUrl } : {}),
-        });
-    } catch (error) {
-        return res.status(500).json({ message: error.message });
-    }
-};
-
-// @desc    Dev helper to verify email without SMTP
-// @route   POST /api/users/dev/verify-email
-// @access  Public (development only)
-const devVerifyEmail = async (req, res) => {
-    try {
-        if (process.env.NODE_ENV === "production") {
-            return res.status(403).json({ message: "Not available in production" });
-        }
-
-        const normalizedEmail = normalizeEmail(req.body.email);
-        const user = await User.findOne({ email: normalizedEmail });
-
-        if (!user) {
-            return res.status(404).json({ message: "No user found with this email" });
-        }
-
-        user.isVerified = true;
-        user.verificationToken = undefined;
-        user.verificationTokenExpire = undefined;
-        await user.save();
-
-        return res.status(200).json({ message: "User verified in development mode" });
-    } catch (error) {
-        return res.status(500).json({ message: error.message });
-    }
-};
-
 // @desc    Login user
 // @route   POST /api/users/login/user
 // @access  Public
@@ -291,11 +267,10 @@ const forgotPassword = async (req, res) => {
         await user.save();
 
         const resetUrl = `${process.env.FRONTEND_URL || "http://localhost:5173"}/reset-password/${resetToken.rawToken}`;
-        const mailResult = await sendPasswordResetEmail(user.email, resetUrl);
+        await sendPasswordResetEmail(user.email, resetUrl);
 
         return res.status(200).json({
             message: "Password reset email sent",
-            ...(mailResult.previewUrl ? { resetPreviewUrl: mailResult.previewUrl } : {}),
         });
     } catch (error) {
         return res.status(500).json({ message: error.message });
@@ -359,7 +334,7 @@ const getAllUsersForAdmin = async (req, res) => {
             : 50;
 
         const users = await User.find({})
-            .select("-password -verificationToken -verificationTokenExpire -resetPasswordToken -resetPasswordExpire")
+            .select("-password -resetPasswordToken -resetPasswordExpire")
             .sort({ createdAt: -1 })
             .limit(limit);
 
@@ -384,7 +359,6 @@ module.exports = {
     registerAdmin,
     verifyUserEmail,
     resendVerification,
-    devVerifyEmail,
     loginUser,
     loginAdmin,
     forgotPassword,
