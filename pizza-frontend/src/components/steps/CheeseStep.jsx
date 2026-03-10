@@ -20,7 +20,11 @@ const CheeseStep = () => {
                         checked={pizzaData.cheese === cheeseItem.name}
                         onChange={(event) => updatePizza("cheese", event.target.value)}
                     />
-                    <span>{cheeseItem.name}</span>
+                    <span className="option-copy">
+                        <strong>{cheeseItem.name}</strong>
+                        <small>Melt factor and creaminess booster</small>
+                    </span>
+                    {Number(cheeseItem.price) > 0 && <span className="option-price">+ INR {cheeseItem.price}</span>}
                 </label>
             ))}
         </section>

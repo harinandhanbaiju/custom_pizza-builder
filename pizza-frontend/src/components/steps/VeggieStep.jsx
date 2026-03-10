@@ -28,7 +28,11 @@ const VeggieStep = () => {
                         checked={pizzaData.veggies.includes(veggieItem.name)}
                         onChange={() => toggleVeggie(veggieItem.name)}
                     />
-                    <span>{veggieItem.name}</span>
+                    <span className="option-copy">
+                        <strong>{veggieItem.name}</strong>
+                        <small>Fresh crunch and color on every bite</small>
+                    </span>
+                    {Number(veggieItem.price) > 0 && <span className="option-price">+ INR {veggieItem.price}</span>}
                 </label>
             ))}
         </section>

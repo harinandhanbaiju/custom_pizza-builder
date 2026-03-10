@@ -34,18 +34,21 @@ const PizzaBuilder = () => {
     return (
         <main className="builder-shell">
             <h1>Build Your Pizza</h1>
-            <p>Step {currentStep} of 5</p>
+            <p className="builder-step-label">Step {currentStep} of 5</p>
+            <div className="builder-progress" aria-hidden="true">
+                <span style={{ width: `${(currentStep / 5) * 100}%` }} />
+            </div>
 
             <div className="step-card">{stepComponentMap[currentStep]}</div>
 
             <div className="step-actions">
                 {currentStep > 1 && (
-                    <button type="button" onClick={prevStep}>
+                    <button type="button" className="btn-ghost" onClick={prevStep}>
                         Back
                     </button>
                 )}
                 {currentStep < 5 && (
-                    <button type="button" onClick={nextStep} disabled={!canMoveForward()}>
+                    <button type="button" className="btn-primary" onClick={nextStep} disabled={!canMoveForward()}>
                         Next
                     </button>
                 )}

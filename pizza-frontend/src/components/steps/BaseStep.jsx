@@ -20,7 +20,11 @@ const BaseStep = () => {
                         checked={pizzaData.base === baseItem.name}
                         onChange={(event) => updatePizza("base", event.target.value)}
                     />
-                    <span>{baseItem.name}</span>
+                    <span className="option-copy">
+                        <strong>{baseItem.name}</strong>
+                        <small>Perfect crust balance for your toppings</small>
+                    </span>
+                    {Number(baseItem.price) > 0 && <span className="option-price">+ INR {baseItem.price}</span>}
                 </label>
             ))}
         </section>

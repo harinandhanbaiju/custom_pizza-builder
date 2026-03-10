@@ -20,7 +20,11 @@ const SauceStep = () => {
                         checked={pizzaData.sauce === sauceItem.name}
                         onChange={(event) => updatePizza("sauce", event.target.value)}
                     />
-                    <span>{sauceItem.name}</span>
+                    <span className="option-copy">
+                        <strong>{sauceItem.name}</strong>
+                        <small>Flavor base that defines the pizza mood</small>
+                    </span>
+                    {Number(sauceItem.price) > 0 && <span className="option-price">+ INR {sauceItem.price}</span>}
                 </label>
             ))}
         </section>

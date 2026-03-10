@@ -8,19 +8,35 @@ import { useAuth } from "./context/AuthContext";
 import AdminInventoryManager from "./components/AdminInventoryManager";
 import OvenRushHomeChrome from "./components/OvenRushHomeChrome";
 
+const AuthPage = () => {
+    return (
+        <div className="auth-page-shell">
+            <section className="auth-page-hero">
+                <p className="auth-page-kicker">OvenRush</p>
+                <h1>Login to continue your pizza journey</h1>
+                <p>
+                    Sign in to build custom pizzas, track ingredient stock, and place your order in minutes.
+                </p>
+            </section>
+            <AuthPanel />
+        </div>
+    );
+};
+
 const AuthenticatedArea = () => {
     const { user } = useAuth();
 
     if (!user) {
-        return null;
+        return <AuthPage />;
     }
 
     return (
-        <>
+        <div className="app-shell">
+            <OvenRushHomeChrome />
             <PizzaDashboard />
             {user?.role === "admin" && <AdminInventoryManager />}
             <PizzaBuilder />
-        </>
+        </div>
     );
 };
 
@@ -28,11 +44,7 @@ const App = () => {
     return (
         <AuthProvider>
             <PizzaBuilderProvider>
-                <div className="app-shell">
-                    <OvenRushHomeChrome />
-                    <AuthPanel />
-                    <AuthenticatedArea />
-                </div>
+                <AuthenticatedArea />
             </PizzaBuilderProvider>
         </AuthProvider>
     );

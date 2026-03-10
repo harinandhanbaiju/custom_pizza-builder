@@ -150,7 +150,7 @@ const AuthPanel = () => {
 
     if (user) {
         return (
-            <section className="auth-panel">
+            <section className="auth-panel auth-panel-logged-in">
                 <p>Signed in as <strong>{user.email}</strong></p>
                 <p>Role: <strong>{user.role || (user.isAdmin ? "admin" : "user")}</strong></p>
                 <p>Status: <strong>{user.isVerified ? "Verified" : "Unverified"}</strong></p>
@@ -163,23 +163,23 @@ const AuthPanel = () => {
         <form className="auth-panel" onSubmit={handleSubmit}>
             <h2>Authentication</h2>
             <div className="mode-switch">
-                <button type="button" onClick={() => switchMode("user-login")}>User Login</button>
-                <button type="button" onClick={() => switchMode("admin-login")}>Admin Login</button>
-                <button type="button" onClick={() => switchMode("user-register")}>User Register</button>
-                <button type="button" onClick={() => switchMode("admin-register")}>Admin Register</button>
-                <button type="button" onClick={() => switchMode("forgot-password")}>Forgot</button>
-                <button type="button" onClick={() => switchMode("reset-password")}>Reset</button>
+                <button type="button" className={mode === "user-login" ? "is-active" : ""} onClick={() => switchMode("user-login")}>User Login</button>
+                <button type="button" className={mode === "admin-login" ? "is-active" : ""} onClick={() => switchMode("admin-login")}>Admin Login</button>
+                <button type="button" className={mode === "user-register" ? "is-active" : ""} onClick={() => switchMode("user-register")}>User Register</button>
+                <button type="button" className={mode === "admin-register" ? "is-active" : ""} onClick={() => switchMode("admin-register")}>Admin Register</button>
+                <button type="button" className={mode === "forgot-password" ? "is-active" : ""} onClick={() => switchMode("forgot-password")}>Forgot</button>
+                <button type="button" className={mode === "reset-password" ? "is-active" : ""} onClick={() => switchMode("reset-password")}>Reset</button>
             </div>
 
-            {statusMessage && <p>{statusMessage}</p>}
+            {statusMessage && <p className="auth-feedback auth-feedback-success">{statusMessage}</p>}
             {statusLink && (
-                <p>
+                <p className="auth-feedback auth-feedback-link">
                     <a href={statusLink} target="_blank" rel="noreferrer">
                         Open verification link
                     </a>
                 </p>
             )}
-            {errorMessage && <p>{errorMessage}</p>}
+            {errorMessage && <p className="auth-feedback auth-feedback-error">{errorMessage}</p>}
 
             {(mode === "user-register" || mode === "admin-register") && (
                 <>
@@ -244,7 +244,7 @@ const AuthPanel = () => {
                 {isLoading ? "Processing..." : "Submit"}
             </button>
 
-            {isAdminMode && <p>Admin mode is active.</p>}
+            {isAdminMode && <p className="auth-mode-note">Admin mode is active.</p>}
         </form>
     );
 };
