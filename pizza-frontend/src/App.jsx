@@ -13,10 +13,10 @@ const AuthPage = () => {
     return (
         <div className="auth-page-shell">
             <section className="auth-page-hero">
-                <p className="auth-page-kicker">OvenRush</p>
-                <h1>Login to continue your pizza journey</h1>
+                <p className="auth-page-kicker">FC Barcelona Edition</p>
+                <h1>Login to enter the Blaugrana Pizza Arena</h1>
                 <p>
-                    Sign in to build custom pizzas, track ingredient stock, and place your order in minutes.
+                    Sign in to craft match-day pizzas, track kitchen stock, and place your order with champion speed.
                 </p>
             </section>
             <AuthPanel />

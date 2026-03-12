@@ -1,22 +1,22 @@
 @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Bricolage+Grotesque:wght@600;700;800&display=swap");
 
 :root {
-    --brand-red: #d2452f;
-    --brand-red-dark: #ab3423;
-    --brand-cream: #fff8ec;
-    --brand-mint: #1d7c73;
-    --brand-ink: #172226;
-    --brand-subtle: #6f797d;
+    --brand-red: #a50044;
+    --brand-red-dark: #7f0036;
+    --brand-cream: #f6f3ea;
+    --brand-mint: #004d98;
+    --brand-ink: #0f1c2f;
+    --brand-subtle: #4e5a71;
     --surface: #ffffff;
-    --surface-warm: #fffdf7;
-    --line: #eddcc7;
-    --ok: #207f58;
-    --danger: #c73a3a;
+    --surface-warm: #f8f4ec;
+    --line: #d8c9a5;
+    --ok: #116f55;
+    --danger: #a3223a;
     --radius-lg: 20px;
     --radius-md: 14px;
     --radius-sm: 10px;
-    --shadow-lg: 0 14px 32px rgba(23, 34, 38, 0.12);
-    --shadow-md: 0 8px 22px rgba(23, 34, 38, 0.1);
+    --shadow-lg: 0 14px 32px rgba(15, 28, 47, 0.16);
+    --shadow-md: 0 8px 22px rgba(15, 28, 47, 0.12);
 }
 
 * {
@@ -29,9 +29,9 @@ body {
     color: var(--brand-ink);
     font-family: "Space Grotesk", "Segoe UI", sans-serif;
     background:
-        radial-gradient(circle at 12% 18%, rgba(210, 69, 47, 0.13), transparent 34%),
-        radial-gradient(circle at 88% 26%, rgba(29, 124, 115, 0.16), transparent 33%),
-        linear-gradient(165deg, #fff9f1 0%, #fef8ef 45%, #f4f8f7 100%);
+    radial-gradient(circle at 12% 18%, rgba(165, 0, 68, 0.2), transparent 34%),
+    radial-gradient(circle at 88% 26%, rgba(0, 77, 152, 0.22), transparent 33%),
+    linear-gradient(165deg, #f7f1e4 0%, #f1ebdd 45%, #ede8dd 100%);
 }
 
 body::before {
@@ -39,11 +39,27 @@ body::before {
     position: fixed;
     inset: 0;
     pointer-events: none;
-    background-image: linear-gradient(rgba(255, 255, 255, 0.45) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.45) 1px, transparent 1px);
+    background-image: linear-gradient(rgba(255, 255, 255, 0.34) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.34) 1px, transparent 1px);
     background-size: 28px 28px;
     mask-image: radial-gradient(circle at center, black 52%, transparent 90%);
     z-index: -1;
+}
+
+body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: -2;
+    opacity: 0.12;
+    background: repeating-linear-gradient(
+        90deg,
+        #a50044 0,
+        #a50044 88px,
+        #004d98 88px,
+        #004d98 176px
+    );
 }
 
 .app-shell {
@@ -103,7 +119,7 @@ body::before {
 .auth-page-hero {
     border: 1px solid var(--line);
     border-radius: var(--radius-lg);
-    background: linear-gradient(140deg, #d2452f 0%, #dd7e2d 55%, #e9b050 100%);
+    background: linear-gradient(140deg, #a50044 0%, #8d003d 42%, #004d98 100%);
     box-shadow: var(--shadow-lg);
     color: #fff;
     padding: clamp(22px, 3vw, 34px);
@@ -319,7 +335,7 @@ body::before {
     color: #fff;
     padding: 18px;
     box-shadow: var(--shadow-lg);
-    background: linear-gradient(120deg, #c73f2b 0%, #e07f2a 54%, #e9b050 100%);
+    background: linear-gradient(120deg, #a50044 0%, #7f0036 44%, #004d98 100%);
 }
 
 .or-banner::after {
@@ -375,7 +391,7 @@ body::before {
 
 .or-dot.is-active {
     width: 52px;
-    background: linear-gradient(90deg, #d2452f 0%, #ea9330 100%);
+    background: linear-gradient(90deg, #a50044 0%, #004d98 100%);
     opacity: 1;
 }
 
@@ -425,11 +441,11 @@ body::before {
 .or-category-pill,
 .or-filter-chip,
 .mode-switch button {
-    border: 1px solid #e4d5c2;
+    border: 1px solid #d9c79f;
     border-radius: 12px;
     white-space: nowrap;
-    background: #fffefa;
-    color: #5a6166;
+    background: #fdfaf2;
+    color: #4a5568;
     font-size: 13px;
     font-weight: 600;
     min-height: 38px;
@@ -494,7 +510,7 @@ body::before {
     display: block;
     height: 100%;
     border-radius: inherit;
-    background: linear-gradient(90deg, #d2452f 0%, #e58e2d 100%);
+    background: linear-gradient(90deg, #a50044 0%, #004d98 100%);
     transition: width 0.25s ease;
 }
 
@@ -513,7 +529,7 @@ select {
 
 input:not([type="radio"]):not([type="checkbox"]):focus,
 select:focus {
-    outline: 3px solid rgba(210, 69, 47, 0.18);
+    outline: 3px solid rgba(165, 0, 68, 0.2);
     border-color: var(--brand-red);
 }
 
@@ -621,9 +637,9 @@ button[disabled] {
 }
 
 .option-row:has(input:checked) {
-    background: linear-gradient(135deg, #fff6ee 0%, #fffbf5 100%);
-    border-color: #d2452f;
-    box-shadow: 0 8px 18px rgba(210, 69, 47, 0.12);
+    background: linear-gradient(135deg, #fff7fb 0%, #f2f7ff 100%);
+    border-color: #a50044;
+    box-shadow: 0 8px 18px rgba(165, 0, 68, 0.14);
     transform: translateY(-1px);
 }
 
@@ -657,9 +673,9 @@ button[disabled] {
     justify-content: center;
     min-height: 30px;
     border-radius: 999px;
-    border: 1px solid #e6cfb3;
-    background: #fff8ef;
-    color: #7f4f22;
+    border: 1px solid #d7c39a;
+    background: #f8f1e4;
+    color: #66522c;
     font-size: 12px;
     font-weight: 700;
     padding: 0 10px;

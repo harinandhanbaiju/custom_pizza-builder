@@ -1,26 +1,26 @@
 import React, { useEffect, useMemo, useState } from "react";
 
-const filters = ["Fast Delivery", "New on OvenRush", "Pure Veg", "Offers"];
-const categories = ["Customize", "Sides", "Drinks", "Desserts", "Combos"];
+const filters = ["Matchday Fast", "New at Barca Kitchen", "Pure Veg", "Culers Offers"];
+const categories = ["Camp Nou Custom", "Tapas Sides", "Drinks", "Desserts", "Family Combos"];
 const locations = ["Home - 2nd Main Road", "Office - Tidel Park", "Hostel - Block C"];
 const banners = [
     {
         id: "b1",
-        tag: "50% OFF up to Rs100",
-        title: "Build your custom pizza in 3 mins",
-        description: "Fresh dough, premium toppings, blazing fast delivery.",
+        tag: "VISCA BARCA DEAL",
+        title: "Build your Blaugrana pizza in 3 mins",
+        description: "Club colors, premium toppings, and fast kickoff delivery.",
     },
     {
         id: "b2",
         tag: "FREE DELIVERY",
-        title: "Weekend combo specials",
-        description: "Add drinks and sides to save more on every order.",
+        title: "Camp Nou weekend combo specials",
+        description: "Add tapas sides and drinks to save on every match order.",
     },
     {
         id: "b3",
         tag: "BUY 1 GET 1",
-        title: "Late night cravings sorted",
-        description: "Hot pizzas delivered till midnight across your area.",
+        title: "Late night Culers cravings sorted",
+        description: "Hot pizzas delivered till midnight with stadium energy.",
     },
 ];
 
@@ -76,7 +76,7 @@ const OvenRushHomeChrome = () => {
     const [searchText, setSearchText] = useState("");
     const [selectedLocation, setSelectedLocation] = useState(locations[0]);
     const [showLocations, setShowLocations] = useState(false);
-    const [infoMessage, setInfoMessage] = useState("Showing popular custom pizza picks");
+    const [infoMessage, setInfoMessage] = useState("Showing popular FC Barcelona matchday picks");
 
     useEffect(() => {
         const intervalId = setInterval(() => {
@@ -102,7 +102,7 @@ const OvenRushHomeChrome = () => {
     };
 
     const handleMicClick = () => {
-        setInfoMessage("Voice search preview: say 'paneer pizza under 300'");
+        setInfoMessage("Voice search preview: say 'Blaugrana special under 300'");
     };
 
     const handleProfileClick = () => {
