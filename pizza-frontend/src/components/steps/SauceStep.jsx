@@ -3,6 +3,7 @@ import { usePizzaBuilder } from "../../context/PizzaBuilderContext";
 
 const SauceStep = () => {
     const { pizzaData, updatePizza, options, isOptionsLoading } = usePizzaBuilder();
+    const sauceOptions = options.sauce.slice(0, 5);
 
     if (isOptionsLoading) {
         return <section><h2>Step 2: Choose Sauce</h2><p>Loading options...</p></section>;
@@ -11,7 +12,8 @@ const SauceStep = () => {
     return (
         <section>
             <h2>Step 2: Choose Sauce</h2>
-            {options.sauce.map((sauceItem) => (
+            {!sauceOptions.length && <p>No sauce options available right now.</p>}
+            {sauceOptions.map((sauceItem) => (
                 <label key={sauceItem.name} className="option-row">
                     <input
                         type="radio"

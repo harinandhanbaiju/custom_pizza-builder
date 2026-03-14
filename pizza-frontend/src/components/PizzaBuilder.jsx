@@ -32,8 +32,11 @@ const PizzaBuilder = () => {
     };
 
     return (
-        <main className="builder-shell">
+        <main className="builder-shell" id="pizza-builder">
             <h1>Build Your Pizza</h1>
+            <p className="builder-flow-copy">
+                Flow: Pick 1 base from 5 options, then 1 sauce from 5 options, select your cheese, and choose veggies.
+            </p>
             <p className="builder-step-label">Step {currentStep} of 5</p>
             <div className="builder-progress" aria-hidden="true">
                 <span style={{ width: `${(currentStep / 5) * 100}%` }} />

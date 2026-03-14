@@ -498,6 +498,12 @@ body::after {
     color: var(--brand-subtle);
 }
 
+.builder-flow-copy {
+    margin: 4px 0 8px;
+    color: var(--brand-subtle);
+    font-size: 14px;
+}
+
 .builder-progress {
     height: 10px;
     width: 100%;
@@ -737,6 +743,36 @@ button[disabled] {
 
 .dashboard-card li {
     margin-bottom: 5px;
+}
+
+.dashboard-flow-card {
+    margin: 10px 0 14px;
+}
+
+.dashboard-flow-card p {
+    margin: 0 0 8px;
+}
+
+.dashboard-flow-total {
+    color: var(--brand-subtle);
+}
+
+.dashboard-start-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 36px;
+    border-radius: 10px;
+    padding: 0 12px;
+    color: #fff;
+    background: var(--brand-red);
+    border: 1px solid var(--brand-red);
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.dashboard-start-link:hover {
+    background: var(--brand-red-dark);
 }
 
 .user-orders-card {

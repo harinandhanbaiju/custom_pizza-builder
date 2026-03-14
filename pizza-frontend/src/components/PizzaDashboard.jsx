@@ -57,6 +57,7 @@ const PizzaDashboard = () => {
     }, [inventory]);
 
     const showAdminStock = user?.role === "admin";
+    const availableVarietiesCount = inventory.base.length * inventory.sauce.length;
 
     if (isLoading) {
         return (
@@ -74,6 +75,17 @@ const PizzaDashboard = () => {
                 Available pizza ingredient varieties
                 {lastUpdated ? ` (Last updated: ${lastUpdated.toLocaleTimeString()})` : ""}
             </p>
+            <article className="dashboard-card dashboard-flow-card">
+                <h3>Start Custom Pizza</h3>
+                <p>
+                    Build from <strong>{inventory.base.length}</strong> bases and <strong>{inventory.sauce.length}</strong> sauces,
+                    then pick your cheese and veggies.
+                </p>
+                <p className="dashboard-flow-total">
+                    Base x sauce combinations available: <strong>{availableVarietiesCount}</strong>
+                </p>
+                <a className="dashboard-start-link" href="#pizza-builder">Start Customizing</a>
+            </article>
             {showAdminStock && (
                 <p>
                     Low stock items: <strong>{lowStockItems.length}</strong>
