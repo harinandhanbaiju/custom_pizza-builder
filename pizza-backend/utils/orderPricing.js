@@ -1,7 +1,8 @@
 const Inventory = require("../models/Inventory");
+const { sendLowStockAlertEmail } = require("../services/emailService");
 
-const findInventoryItem = async (itemType, name) => {
-    return Inventory.findOne({ itemType, name });
+const findInventoryItem = async (itemType, itemName) => {
+    return Inventory.findOne({ itemType, itemName });
 };
 
 const getValidatedOrderPricing = async (pizzaConfig) => {
@@ -21,7 +22,7 @@ const getValidatedOrderPricing = async (pizzaConfig) => {
 
     const veggieItems = await Inventory.find({
         itemType: "veggie",
-        name: { $in: veggies },
+        itemName: { $in: veggies },
     });
 
     if (veggies.length !== veggieItems.length) {
@@ -30,9 +31,9 @@ const getValidatedOrderPricing = async (pizzaConfig) => {
 
     const allItems = [baseItem, sauceItem, cheeseItem, ...veggieItems];
 
-    const outOfStockItem = allItems.find((item) => item.stockQuantity < 1);
+    const outOfStockItem = allItems.find((item) => item.quantity < 1);
     if (outOfStockItem) {
-        throw new Error(`${outOfStockItem.name} is out of stock`);
+        throw new Error(`${outOfStockItem.itemName} is out of stock`);
     }
 
     const totalPrice = allItems.reduce((sum, item) => sum + item.price, 0);
@@ -42,10 +43,23 @@ const getValidatedOrderPricing = async (pizzaConfig) => {
 
 const decrementInventoryForOrder = async (items) => {
     for (const item of items) {
-        await Inventory.updateOne(
-            { _id: item._id, stockQuantity: { $gt: 0 } },
-            { $inc: { stockQuantity: -1 } }
+        const updatedItem = await Inventory.findOneAndUpdate(
+            { _id: item._id, quantity: { $gt: 0 } },
+            { $inc: { quantity: -1 } },
+            { new: true }
         );
+
+        if (!updatedItem) {
+            throw new Error(`${item.itemName} is out of stock`);
+        }
+
+        if (updatedItem && updatedItem.quantity < updatedItem.threshold && !updatedItem.alertSent) {
+            await Inventory.updateOne(
+                { _id: updatedItem._id },
+                { $set: { alertSent: true } }
+            );
+            sendLowStockAlertEmail(updatedItem).catch(console.error);
+        }
     }
 };
 

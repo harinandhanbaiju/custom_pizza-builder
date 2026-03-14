@@ -1,6 +1,8 @@
 const User = require("../models/User");
+const Otp = require("../models/Otp");
 const generateToken = require("../utils/generateToken");
 const crypto = require("crypto");
+const nodemailer = require("nodemailer");
 const sendVerificationEmail = require("../utils/sendVerificationEmail");
 const sendPasswordResetEmail = require("../utils/sendPasswordResetEmail");
 
@@ -96,9 +98,51 @@ const issueVerificationToken = () => {
     };
 };
 
+// @desc    Send OTP to email
+// @route   POST /api/users/send-otp
+// @access  Public
+const sendOtp = async (req, res) => {
+    try {
+        const email = normalizeEmail(req.body.email);
+        if (!EMAIL_REGEX.test(email)) {
+            return res.status(400).json({ message: "Please provide a valid email" });
+        }
+
+        const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+        await Otp.deleteMany({ email }); // Clear older OTPs for this email
+        await Otp.create({ email, otpCode });
+
+        // Try to send via nodemailer
+        const transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS,
+            },
+        });
+        
+        try {
+            await transporter.sendMail({
+                from: process.env.EMAIL_USER,
+                to: email,
+                subject: "Your Registration OTP",
+                text: `Your Pizza Delivery registration OTP is: ${otpCode}. It will expire in 5 minutes.`,
+            });
+        } catch(err) {
+            console.error("Failed to mail OTP, showing in console for testing:", err.message);
+            console.log(`OTP fallback for ${email}: ${otpCode}`);
+        }
+
+        return res.status(200).json({ message: "OTP sent successfully" });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
 const registerAccount = async (req, res, targetRole) => {
     try {
-        const { name, email, password, phone, address, adminRegistrationSecret } = req.body;
+        const { name, email, password, phone, address, otp, adminRegistrationSecret } = req.body;
 
         const validationError = ensureValidRegistrationInput({ name, email, password });
 
@@ -106,7 +150,16 @@ const registerAccount = async (req, res, targetRole) => {
             return res.status(400).json({ message: validationError });
         }
 
+        if (!otp) {
+            return res.status(400).json({ message: "OTP is required required" });
+        }
+
         const normalizedEmail = normalizeEmail(email);
+
+        const validOtp = await Otp.findOne({ email: normalizedEmail, otpCode: otp });
+        if (!validOtp) {
+            return res.status(400).json({ message: "Invalid or expired OTP" });
+        }
 
         if (!EMAIL_REGEX.test(normalizedEmail)) {
             return res.status(400).json({ message: "Please provide a valid email" });
@@ -125,8 +178,6 @@ const registerAccount = async (req, res, targetRole) => {
             return res.status(403).json({ message: "Invalid admin registration secret" });
         }
 
-        const verificationToken = issueVerificationToken();
-
         const user = await User.create({
             name: name.trim(),
             email: normalizedEmail,
@@ -135,19 +186,13 @@ const registerAccount = async (req, res, targetRole) => {
             address,
             role: targetRole,
             isAdmin: targetRole === "admin",
-            isVerified: false,
-            verificationToken: verificationToken.hashedToken,
-            verificationTokenExpire: verificationToken.expiresAt,
+            isVerified: true,
         });
 
-        const mailResult = await sendVerificationEmail(user.email, verificationToken.rawToken);
-
         return res.status(201).json({
-            message: "Registration successful. Please verify your email before login.",
+            message: "Registration successful. You can now log in.",
             email: user.email,
             role: user.role,
-            requiresEmailVerification: true,
-            ...(mailResult.previewUrl ? { verificationPreviewUrl: mailResult.previewUrl } : {}),
         });
     } catch (error) {
         return res.status(500).json({ message: error.message });
@@ -269,10 +314,6 @@ const loginAccount = async (req, res, requiredRole) => {
             }
 
             return res.status(403).json({ message: `${requiredRole} login is required for this account` });
-        }
-
-        if (!user.isVerified) {
-            return res.status(403).json({ message: "Please verify your email before logging in" });
         }
 
         if (isAdminLogin) {
@@ -431,6 +472,39 @@ const getAllUsersForAdmin = async (req, res) => {
     }
 };
 
+// @desc    Delete a user account (admin)
+// @route   DELETE /api/users/admin/users/:id
+// @access  Private/Admin
+const deleteUserByAdmin = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        if (!id) {
+            return res.status(400).json({ message: "User id is required" });
+        }
+
+        if (String(req.user._id) === String(id)) {
+            return res.status(400).json({ message: "You cannot delete your own account" });
+        }
+
+        const targetUser = await User.findById(id);
+
+        if (!targetUser) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        await User.findByIdAndDelete(id);
+
+        return res.status(200).json({
+            message: "User deleted successfully",
+            deletedUserId: id,
+            deletedEmail: targetUser.email,
+        });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
 // @desc    Get logged in user profile
 // @route   GET /api/users/profile
 // @access  Private
@@ -439,6 +513,7 @@ const getUserProfile = async (req, res) => {
 };
 
 module.exports = {
+    sendOtp,
     registerUser,
     registerAdmin,
     verifyUserEmail,
@@ -451,4 +526,5 @@ module.exports = {
     getUserProfile,
     getAdminDashboard,
     getAllUsersForAdmin,
+    deleteUserByAdmin,
 };

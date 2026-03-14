@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { getAdminUsers } from "../services/authService";
+import { deleteAdminUser, getAdminUsers } from "../services/authService";
 import { useAuth } from "../context/AuthContext";
 
 const AdminUserManager = () => {
     const { token, user: currentUser } = useAuth();
     const [users, setUsers] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [deletingUserId, setDeletingUserId] = useState("");
 
     const loadUsers = useCallback(async ({ silent = false } = {}) => {
         try {
@@ -19,6 +20,31 @@ const AdminUserManager = () => {
             setIsLoading(false);
         }
     }, [token]);
+
+    const handleDeleteUser = async (targetUser) => {
+        const isSelf = String(targetUser?._id) === String(currentUser?._id);
+
+        if (isSelf) {
+            alert("You cannot delete your own account.");
+            return;
+        }
+
+        const isConfirmed = window.confirm(`Delete user ${targetUser.email}? This action cannot be undone.`);
+
+        if (!isConfirmed) {
+            return;
+        }
+
+        try {
+            setDeletingUserId(String(targetUser._id));
+            await deleteAdminUser(targetUser._id, token);
+            setUsers((prev) => prev.filter((user) => String(user._id) !== String(targetUser._id)));
+        } catch (error) {
+            alert(error.message || "Failed to delete user");
+        } finally {
+            setDeletingUserId("");
+        }
+    };
 
     useEffect(() => {
         loadUsers();
@@ -68,7 +94,14 @@ const AdminUserManager = () => {
                                     {String(targetUser._id) === String(currentUser?._id) ? (
                                         <span className="admin-user-self-tag">Current account</span>
                                     ) : (
-                                        <span className="admin-user-self-tag">-</span>
+                                        <button
+                                            type="button"
+                                            className="admin-user-delete-btn"
+                                            onClick={() => handleDeleteUser(targetUser)}
+                                            disabled={deletingUserId === String(targetUser._id)}
+                                        >
+                                            {deletingUserId === String(targetUser._id) ? "Deleting..." : "Delete"}
+                                        </button>
                                     )}
                                 </td>
                             </tr>

@@ -132,3 +132,34 @@ export const getAdminUsers = async (token, limit = 100) => {
 
     throw new Error("Failed to load admin users");
 };
+
+export const deleteAdminUser = async (userId, token) => {
+    const endpoints = [
+        `${API_BASE_URL}/admin/users/${encodeURIComponent(userId)}`,
+        `${API_BASE_URL}/users/admin/users/${encodeURIComponent(userId)}`,
+    ];
+
+    for (let i = 0; i < endpoints.length; i += 1) {
+        const endpoint = endpoints[i];
+        try {
+            const response = await fetch(endpoint, {
+                method: "DELETE",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            return await parseApiResponse(response);
+        } catch (error) {
+            if (i === endpoints.length - 1) {
+                throw error;
+            }
+        }
+    }
+
+    throw new Error("Failed to delete user");
+};
+
+export const sendOtp = async (email) => {
+    return postJson(`${API_BASE_URL}/users/send-otp`, { email });
+};

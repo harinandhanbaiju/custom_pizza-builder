@@ -21,6 +21,24 @@ const getAuthHeaders = (token) => ({
     Authorization: `Bearer ${token}`,
 });
 
+const toBackendInventoryPayload = (payload = {}) => {
+    const mapped = {
+        ...payload,
+    };
+
+    if (Object.prototype.hasOwnProperty.call(payload, "stockQuantity")) {
+        mapped.quantity = Number(payload.stockQuantity);
+        delete mapped.stockQuantity;
+    }
+
+    if (Object.prototype.hasOwnProperty.call(payload, "thresholdValue")) {
+        mapped.threshold = Number(payload.thresholdValue);
+        delete mapped.thresholdValue;
+    }
+
+    return mapped;
+};
+
 export const seedInventory = async () => {
     const response = await fetch(`${API_BASE_URL}/inventory/seed`, {
         method: "POST",
@@ -51,7 +69,7 @@ export const createInventoryItem = async (payload, token) => {
     const response = await fetch(`${API_BASE_URL}/inventory/admin/item`, {
         method: "POST",
         headers: getAuthHeaders(token),
-        body: JSON.stringify(payload),
+        body: JSON.stringify(toBackendInventoryPayload(payload)),
     });
 
     const data = await response.json();
@@ -67,7 +85,7 @@ export const updateInventoryItem = async (id, payload, token) => {
     const response = await fetch(`${API_BASE_URL}/inventory/admin/item/${id}`, {
         method: "PATCH",
         headers: getAuthHeaders(token),
-        body: JSON.stringify(payload),
+        body: JSON.stringify(toBackendInventoryPayload(payload)),
     });
 
     const data = await response.json();

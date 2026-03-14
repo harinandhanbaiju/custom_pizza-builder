@@ -118,6 +118,7 @@ const AdminInventoryManager = () => {
         <section className="dashboard-shell">
             <h2>Admin Inventory</h2>
             <p>Track stock for bases, sauces, cheese, veggies, and meat.</p>
+            <p>Stock is auto-reduced when customer orders are paid successfully.</p>
 
             <form className="inventory-form" onSubmit={handleCreate}>
                 <select

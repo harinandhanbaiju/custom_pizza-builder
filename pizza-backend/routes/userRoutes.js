@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const {
-	registerUser,
+	sendOtp, registerUser,
 	registerAdmin,
 	verifyUserEmail,
 	resendVerification,
@@ -13,10 +13,12 @@ const {
 	getUserProfile,
 	getAdminDashboard,
 	getAllUsersForAdmin,
+	deleteUserByAdmin,
 } = require("../controllers/userController");
 const { protect, adminOnly, requireVerifiedUser } = require("../middleware/authMiddleware");
 
 // Exact auth endpoints
+router.post("/send-otp", sendOtp);
 router.post("/register", registerUser);
 router.post("/login", loginAny);
 router.get("/verify-email", verifyUserEmail);
@@ -42,5 +44,6 @@ router.get("/verify/:token", verifyUserEmail);
 router.get("/profile", protect, requireVerifiedUser, getUserProfile);
 router.get("/admin/dashboard", protect, requireVerifiedUser, adminOnly, getAdminDashboard);
 router.get("/admin/users", protect, requireVerifiedUser, adminOnly, getAllUsersForAdmin);
+router.delete("/admin/users/:id", protect, requireVerifiedUser, adminOnly, deleteUserByAdmin);
 
 module.exports = router;

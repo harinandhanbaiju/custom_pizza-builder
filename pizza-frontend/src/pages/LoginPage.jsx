@@ -110,13 +110,10 @@ const LoginPage = ({ forcedRole }) => {
                     {isLoading ? "Signing in..." : "Login"}
                 </button>
                 <p className="auth-mode-note">
-                    New account? <Link to="/register">Register</Link>
+                    New account? <Link to={forcedRole === "admin" ? "/admin/register" : "/register"}>Register</Link>
                 </p>
                 <p className="auth-mode-note">
                     Forgot password? <Link to="/forgot-password">Reset it</Link>
-                </p>
-                <p className="auth-mode-note">
-                    Email not verified? <button type="button" className="auth-inline-link" onClick={handleResendVerification}>Verify mail</button>
                 </p>
             </form>
         </div>
