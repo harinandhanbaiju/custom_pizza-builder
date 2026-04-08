@@ -36,7 +36,7 @@ const ResetPasswordPage = () => {
     };
 
     return (
-        <div className="auth-page-shell">
+        <div className="auth-page-shell bt-login">
             <section className="auth-page-hero">
                 <p className="auth-page-kicker">Pizza Delivery</p>
                 <h1>Reset Password</h1>
@@ -55,7 +55,7 @@ const ResetPasswordPage = () => {
                     onChange={(event) => setPassword(event.target.value)}
                     required
                 />
-                <button type="submit" disabled={isLoading || !token}>
+                <button type="submit" className="auth-submit" disabled={isLoading || !token}>
                     {isLoading ? "Updating..." : "Update Password"}
                 </button>
                 <p className="auth-mode-note">

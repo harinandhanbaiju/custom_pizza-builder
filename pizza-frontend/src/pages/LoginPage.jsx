@@ -72,7 +72,7 @@ const LoginPage = ({ forcedRole }) => {
     };
 
     return (
-        <div className="auth-page-shell">
+        <div className="auth-page-shell bt-login">
             <section className="auth-page-hero">
                 <p className="auth-page-kicker">Pizza Delivery</p>
                 <h1>{forcedRole === "admin" ? "Admin Login" : forcedRole === "user" ? "User Login" : "Login to your account"}</h1>
@@ -106,8 +106,11 @@ const LoginPage = ({ forcedRole }) => {
                     onChange={(event) => setPassword(event.target.value)}
                     required
                 />
-                <button type="submit" disabled={isLoading}>
+                <button type="submit" className="auth-submit" disabled={isLoading}>
                     {isLoading ? "Signing in..." : "Login"}
+                </button>
+                <button type="button" className="auth-resend" onClick={handleResendVerification} disabled={isLoading}>
+                    Resend verification email
                 </button>
                 <p className="auth-mode-note">
                     New account? <Link to={forcedRole === "admin" ? "/admin/register" : "/register"}>Register</Link>

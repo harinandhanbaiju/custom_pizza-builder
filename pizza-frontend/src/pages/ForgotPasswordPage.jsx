@@ -29,7 +29,7 @@ const ForgotPasswordPage = () => {
     };
 
     return (
-        <div className="auth-page-shell">
+        <div className="auth-page-shell bt-login">
             <section className="auth-page-hero">
                 <p className="auth-page-kicker">Pizza Delivery</p>
                 <h1>Forgot Password</h1>
@@ -52,7 +52,7 @@ const ForgotPasswordPage = () => {
                     onChange={(event) => setEmail(event.target.value)}
                     required
                 />
-                <button type="submit" disabled={isLoading}>
+                <button type="submit" className="auth-submit" disabled={isLoading}>
                     {isLoading ? "Sending..." : "Send Reset Link"}
                 </button>
                 <p className="auth-mode-note">

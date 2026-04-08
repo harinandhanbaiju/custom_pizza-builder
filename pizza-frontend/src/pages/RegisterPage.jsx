@@ -81,7 +81,7 @@ const RegisterPage = ({ forcedRole }) => {
     };
 
     return (
-        <div className="auth-page-shell">
+        <div className="auth-page-shell bt-login">
             <section className="auth-page-hero">
                 <p className="auth-page-kicker">Pizza Delivery</p>
                 <h1>{isAdminRegistration ? "Create admin account" : "Create your account"}</h1>
@@ -139,12 +139,12 @@ const RegisterPage = ({ forcedRole }) => {
                     />
                 )}
 
-                <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
-                    <button type="button" onClick={handleSendOtp} disabled={isLoading} style={{ flex: 1, backgroundColor: '#555' }}>
+                <div className="auth-action-row">
+                    <button type="button" className="auth-submit auth-submit-muted" onClick={handleSendOtp} disabled={isLoading}>
                         {isOtpSent ? "Resend OTP" : "Send OTP"}
                     </button>
                     
-                    <button type="submit" disabled={isLoading || !isOtpSent} style={{ flex: 1, opacity: (!isOtpSent ? 0.5 : 1) }}>
+                    <button type="submit" className="auth-submit" disabled={isLoading || !isOtpSent}>
                         {isLoading ? "Registering..." : "Register"}
                     </button>
                 </div>

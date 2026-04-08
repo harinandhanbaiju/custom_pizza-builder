@@ -1,42 +1,52 @@
 import React, { useEffect, useMemo, useState } from "react";
 
-const filters = ["Matchday Fast", "New at Barca Kitchen", "Pure Veg", "Culers Offers"];
-const categories = ["Camp Nou Custom", "Tapas Sides", "Drinks", "Desserts", "Family Combos"];
-const locations = ["Home - 2nd Main Road", "Office - Tidel Park", "Hostel - Block C"];
+const filters = ["FAST DELIVERY", "NEW ARRIVALS", "PURE VEG", "OFFERS"];
+const categories = ["CUSTOM PIZZAS", "SIDES", "DRINKS", "DESSERTS", "FAMILY COMBOS"];
+const locations = ["HOME · 2ND MAIN ROAD", "OFFICE · TIDEL PARK", "HOSTEL · BLOCK C"];
+const quickMetrics = [
+    { id: "m1", label: "TODAY'S ORDERS", value: "24", trend: "^8 vs yesterday", trendType: "up" },
+    { id: "m2", label: "ACTIVE COMBOS", value: "3", trend: "Ends Sunday", trendType: "up" },
+    { id: "m3", label: "AVG DELIVERY", value: "29m", trend: "^3m slower", trendType: "neutral" },
+    { id: "m4", label: "CART VALUE", value: "₹648", trend: "v₹40 vs avg", trendType: "down" },
+];
+
+const popularPicks = [
+    { id: "p1", name: "The Classic", ingredients: "Pepperoni · Mozzarella", price: "₹349" },
+    { id: "p2", name: "Garden Fresh", ingredients: "Spinach · Olives · Feta", price: "₹299" },
+    { id: "p3", name: "Spicy Inferno", ingredients: "Chorizo · Jalapeno · BBQ", price: "₹399" },
+];
 const banners = [
     {
         id: "b1",
-        tag: "VISCA BARCA DEAL",
-        title: "Build your Blaugrana pizza in 3 mins",
-        description: "Club colors, premium toppings, and fast kickoff delivery.",
+        tag: "MATCHDAY SPECIAL",
+        title: "Family feast specials",
+        description: "Bigger pies and sides for your watch-party orders.",
+        eta: "24 MIN",
+        offer: "SAVE ₹180 ON FAMILY BOX",
+        highlights: ["CHEESE BURST", "PARTY WINGS", "FAST RIDER"],
+        cta: "ORDER FEAST",
     },
     {
         id: "b2",
-        tag: "FREE DELIVERY",
-        title: "Camp Nou weekend combo specials",
-        description: "Add tapas sides and drinks to save on every match order.",
+        tag: "WEEKEND SPECIAL",
+        title: "Weekend combo specials",
+        description: "Add sides and drinks to save on every order.",
+        eta: "32 MIN",
+        offer: "FLAT ₹120 OFF ON COMBO CART",
+        highlights: ["GARLIC KNOTS", "2 CHILLERS", "LATE-NIGHT SLOT"],
+        cta: "CLAIM COMBO",
     },
     {
         id: "b3",
-        tag: "BUY 1 GET 1",
-        title: "Late night Culers cravings sorted",
-        description: "Hot pizzas delivered till midnight with stadium energy.",
+        tag: "NIGHT SPECIAL",
+        title: "Late-night cravings sorted",
+        description: "Hot pizzas and drinks delivered till midnight.",
+        eta: "28 MIN",
+        offer: "BUY 1 GET 1 ON MEDIUM PIZZAS",
+        highlights: ["AFTER 9PM MENU", "EXTRA DIP", "MIDNIGHT SLOT"],
+        cta: "UNLOCK BOGO",
     },
 ];
-
-const UserIcon = () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" stroke="currentColor" strokeWidth="1.8" />
-        <path d="M5 20a7 7 0 0 1 14 0" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-    </svg>
-);
-
-const BellIcon = () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <path d="M18 9a6 6 0 1 0-12 0c0 7-3 7-3 7h18s-3 0-3-7Z" stroke="currentColor" strokeWidth="1.8" />
-        <path d="M10.5 20a1.5 1.5 0 0 0 3 0" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-    </svg>
-);
 
 const PinIcon = () => (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -61,18 +71,10 @@ const SearchIcon = () => (
     </svg>
 );
 
-const MicIcon = () => (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <rect x="9" y="3" width="6" height="11" rx="3" stroke="currentColor" strokeWidth="1.8" />
-        <path d="M6 11a6 6 0 1 0 12 0" stroke="currentColor" strokeWidth="1.8" />
-        <path d="M12 17v4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-    </svg>
-);
-
-const OvenRushHomeChrome = () => {
+const OvenRushHomeChrome = ({ user, onLogout }) => {
     const [activeCategory, setActiveCategory] = useState(categories[0]);
     const [activeFilters, setActiveFilters] = useState([filters[0]]);
-    const [activeBannerIndex, setActiveBannerIndex] = useState(0);
+    const [activeBannerIndex, setActiveBannerIndex] = useState(1);
     const [searchText, setSearchText] = useState("");
     const [selectedLocation, setSelectedLocation] = useState(locations[0]);
     const [showLocations, setShowLocations] = useState(false);
@@ -101,12 +103,8 @@ const OvenRushHomeChrome = () => {
         setInfoMessage(`Browsing ${category.toLowerCase()} options`);
     };
 
-    const handleMicClick = () => {
-        setInfoMessage("Voice search preview: say 'Blaugrana special under 300'");
-    };
-
     const handleProfileClick = () => {
-        setInfoMessage("Profile panel will open here");
+        setInfoMessage("Profile panel opens from account hub");
     };
 
     const handleOffersClick = () => {
@@ -115,26 +113,25 @@ const OvenRushHomeChrome = () => {
 
     return (
         <section className="or-home-shell">
-            <header className="or-topbar">
-                <button
-                    type="button"
-                    className="or-location"
-                    onClick={() => setShowLocations((prev) => !prev)}
-                    aria-expanded={showLocations}
-                >
-                    <span className="or-location-icon"><PinIcon /></span>
-                    <span>
-                        <span className="or-location-label">Delivery to</span>
-                        <strong>{selectedLocation}</strong>
-                    </span>
-                </button>
-                <div className="or-topbar-actions">
-                    <button type="button" className="or-icon-btn" aria-label="Profile" onClick={handleProfileClick}>
-                        <UserIcon />
+            <header className="or-command-bar">
+                <div className="or-brand-block">
+                    <p className="or-brand-title">PIZZA BUILDER</p>
+                    <button
+                        type="button"
+                        className="or-inline-location"
+                        onClick={() => setShowLocations((prev) => !prev)}
+                        aria-expanded={showLocations}
+                    >
+                        <span className="or-location-icon"><PinIcon /></span>
+                        <span>{selectedLocation}</span>
                     </button>
-                    <button type="button" className="or-icon-btn" aria-label="Offers" onClick={handleOffersClick}>
-                        <BellIcon />
+                </div>
+                <div className="or-command-right">
+                    <button type="button" className="or-user-chip" onClick={handleProfileClick} aria-label="Profile">
+                        <span className="or-user-avatar">{(user?.name || user?.email || "HB").slice(0, 2).toUpperCase()}</span>
+                        <span>{(user?.name || user?.email || "Guest").split("@")[0]}</span>
                     </button>
+                    <button type="button" className="or-logout-btn" onClick={onLogout}>Logout</button>
                 </div>
             </header>
 
@@ -157,52 +154,40 @@ const OvenRushHomeChrome = () => {
                 </div>
             )}
 
-            <div className="or-search-wrap">
-                <div className="or-search-box">
-                    <span className="or-search-icon"><SearchIcon /></span>
-                    <input
-                        className="or-search"
-                        type="text"
-                        placeholder="Search for pizzas, toppings..."
-                        value={searchText}
-                        onChange={(event) => {
-                            setSearchText(event.target.value);
-                            setInfoMessage(event.target.value ? `Searching for '${event.target.value}'` : "Search cleared");
-                        }}
-                    />
-                    <button type="button" className="or-mic-btn" aria-label="Voice search" onClick={handleMicClick}>
-                        <MicIcon />
-                    </button>
-                </div>
-            </div>
-
-            <div className="or-carousel">
-                <article className="or-banner">
-                    <span className="or-tag">{activeBanner.tag}</span>
-                    <h3>{activeBanner.title}</h3>
-                    <p>{activeBanner.description}</p>
-                </article>
-                <div className="or-carousel-footer">
-                    <span className="or-carousel-count">
-                        {activeBannerIndex + 1} / {banners.length}
-                    </span>
-                    <div className="or-carousel-dots" role="tablist" aria-label="Banner selector">
-                        {banners.map((banner, index) => (
-                            <button
-                                key={banner.id}
-                                type="button"
-                                className={`or-dot ${index === activeBannerIndex ? "is-active" : ""}`}
-                                onClick={() => setActiveBannerIndex(index)}
-                                aria-label={`Show banner ${index + 1}`}
-                                aria-selected={index === activeBannerIndex}
-                            />
-                        ))}
+            <div className="or-search-strip">
+                <div className="or-search-wrap">
+                    <div className="or-search-box">
+                        <span className="or-search-icon"><SearchIcon /></span>
+                        <input
+                            className="or-search"
+                            type="text"
+                            placeholder="Search for pizzas, toppings, sides..."
+                            value={searchText}
+                            onChange={(event) => {
+                                setSearchText(event.target.value);
+                                setInfoMessage(event.target.value ? `Searching for '${event.target.value}'` : "Search cleared");
+                            }}
+                        />
                     </div>
                 </div>
+                <button type="button" className="or-chip-pill" onClick={() => setInfoMessage(`Current ${activeBanner.eta} delivery window`)}>
+                    ETA {activeBanner.eta}
+                </button>
+                <button type="button" className="or-chip-pill is-success" onClick={handleOffersClick}>FREE DELIVERY</button>
             </div>
 
+            <section className="or-metrics" aria-label="Quick metrics">
+                {quickMetrics.map((metric) => (
+                    <article className="or-metric-card" key={metric.id}>
+                        <p>{metric.label}</p>
+                        <strong>{metric.value}</strong>
+                        <span className={`or-metric-trend ${metric.trendType}`}>{metric.trend}</span>
+                    </article>
+                ))}
+            </section>
+
             <div className="or-categories" role="tablist" aria-label="Categories">
-                {categories.map((category, index) => (
+                {categories.map((category) => (
                     <button
                         key={category}
                         type="button"
@@ -215,7 +200,7 @@ const OvenRushHomeChrome = () => {
             </div>
 
             <div className="or-filters" role="tablist" aria-label="Quick filters">
-                {filters.map((filter, index) => (
+                {filters.map((filter) => (
                     <button
                         key={filter}
                         type="button"
@@ -226,6 +211,23 @@ const OvenRushHomeChrome = () => {
                     </button>
                 ))}
             </div>
+
+            <section className="or-popular-picks" aria-label="Popular picks">
+                <p className="or-section-label">Popular Picks</p>
+                <div className="or-picks-grid">
+                    {popularPicks.map((pick) => (
+                        <article className="or-pick-card" key={pick.id}>
+                            <span className="or-pick-emoji" aria-hidden="true">🍕</span>
+                            <h4>{pick.name}</h4>
+                            <p>{pick.ingredients}</p>
+                            <div className="or-pick-footer">
+                                <strong>{pick.price}</strong>
+                                <button type="button" onClick={() => setInfoMessage(`${pick.name} added to cart preview`)}>+</button>
+                            </div>
+                        </article>
+                    ))}
+                </div>
+            </section>
 
             <p className="or-helper-message">{infoMessage}</p>
         </section>

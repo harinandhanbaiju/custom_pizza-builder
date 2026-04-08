@@ -19,15 +19,7 @@ const WorkspaceShell = ({ showAdminPanels = false }) => {
 
     return (
         <div className="app-shell">
-            <section className="session-bar">
-                <p>
-                    Signed in as <strong>{user?.email}</strong>
-                </p>
-                <button type="button" className="session-logout" onClick={handleLogout}>
-                    Logout
-                </button>
-            </section>
-            <OvenRushHomeChrome />
+            <OvenRushHomeChrome user={user} onLogout={handleLogout} />
             <PizzaDashboard />
             {showAdminPanels && <AdminOrderManager />}
             {showAdminPanels && <AdminInventoryManager />}

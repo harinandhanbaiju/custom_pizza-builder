@@ -58,105 +58,89 @@ const PizzaDashboard = () => {
 
     const showAdminStock = user?.role === "admin";
     const availableVarietiesCount = inventory.base.length * inventory.sauce.length;
+    const inventorySections = [
+        { key: "base", title: "Bases", items: inventory.base },
+        { key: "sauce", title: "Sauces", items: inventory.sauce },
+        { key: "cheese", title: "Cheese", items: inventory.cheese },
+        { key: "veggie", title: "Veggies", items: inventory.veggie },
+        { key: "meat", title: "Meat", items: inventory.meat },
+    ];
 
     if (isLoading) {
         return (
-            <section className="dashboard-shell">
-                <h2>Pizza Dashboard</h2>
-                <p>Loading varieties...</p>
+            <section className="dashboard-shell bt-dashboard">
+                <header className="bt-dash-header">
+                    <p className="bt-dash-kicker">Kitchen Index</p>
+                    <h2>Dashboard</h2>
+                    <p className="bt-dash-subhead">Loading ingredient matrix...</p>
+                </header>
             </section>
         );
     }
 
     return (
-        <section className="dashboard-shell">
-            <h2>Pizza Dashboard</h2>
-            <p>
-                Available pizza ingredient varieties
-                {lastUpdated ? ` (Last updated: ${lastUpdated.toLocaleTimeString()})` : ""}
-            </p>
-            <article className="dashboard-card dashboard-flow-card">
-                <h3>Start Custom Pizza</h3>
-                <p>
-                    Build from <strong>{inventory.base.length}</strong> bases and <strong>{inventory.sauce.length}</strong> sauces,
-                    then pick your cheese and veggies.
+        <section className="dashboard-shell bt-dashboard">
+            <header className="bt-dash-header">
+                <p className="bt-dash-kicker">Kitchen Index</p>
+                <h2>Pizza Dashboard</h2>
+                <p className="bt-dash-subhead">
+                    Ingredient intelligence and live order pulse
+                    {lastUpdated ? ` . Updated ${lastUpdated.toLocaleTimeString()}` : ""}
                 </p>
-                <p className="dashboard-flow-total">
-                    Base x sauce combinations available: <strong>{availableVarietiesCount}</strong>
+            </header>
+
+            <section className="bt-dash-metrics" aria-label="Dashboard metrics">
+                <article className="bt-dash-metric">
+                    <span className="bt-dash-metric-label">Base x Sauce</span>
+                    <strong>{availableVarietiesCount}</strong>
+                </article>
+                <article className="bt-dash-metric">
+                    <span className="bt-dash-metric-label">My Orders</span>
+                    <strong>{myOrders.length}</strong>
+                </article>
+                <article className="bt-dash-metric">
+                    <span className="bt-dash-metric-label">Low Stock</span>
+                    <strong>{showAdminStock ? lowStockItems.length : "-"}</strong>
+                </article>
+                <article className="bt-dash-metric">
+                    <span className="bt-dash-metric-label">Ingredients</span>
+                    <strong>{inventory.base.length + inventory.sauce.length + inventory.cheese.length + inventory.veggie.length + inventory.meat.length}</strong>
+                </article>
+            </section>
+
+            <article className="dashboard-card dashboard-flow-card bt-dash-cta">
+                <h3>Build Next Pizza</h3>
+                <p>
+                    Pick from <strong>{inventory.base.length}</strong> base options and <strong>{inventory.sauce.length}</strong> sauces,
+                    then finalize cheese and veggie layers.
                 </p>
                 <a className="dashboard-start-link" href="#pizza-builder">Start Customizing</a>
             </article>
-            {showAdminStock && (
-                <p>
-                    Low stock items: <strong>{lowStockItems.length}</strong>
-                </p>
-            )}
-            <div className="dashboard-grid">
-                <article className="dashboard-card">
-                    <h3>Bases</h3>
-                    <ul>
-                        {inventory.base.map((item) => (
-                            <li key={item._id}>
-                                {item.name}
-                                {showAdminStock ? ` - Stock ${item.stockQuantity}` : ""}
-                            </li>
-                        ))}
-                    </ul>
-                </article>
-                <article className="dashboard-card">
-                    <h3>Sauces</h3>
-                    <ul>
-                        {inventory.sauce.map((item) => (
-                            <li key={item._id}>
-                                {item.name}
-                                {showAdminStock ? ` - Stock ${item.stockQuantity}` : ""}
-                            </li>
-                        ))}
-                    </ul>
-                </article>
-                <article className="dashboard-card">
-                    <h3>Cheese</h3>
-                    <ul>
-                        {inventory.cheese.map((item) => (
-                            <li key={item._id}>
-                                {item.name}
-                                {showAdminStock ? ` - Stock ${item.stockQuantity}` : ""}
-                            </li>
-                        ))}
-                    </ul>
-                </article>
-                <article className="dashboard-card">
-                    <h3>Veggies</h3>
-                    <ul>
-                        {inventory.veggie.map((item) => (
-                            <li key={item._id}>
-                                {item.name}
-                                {showAdminStock ? ` - Stock ${item.stockQuantity}` : ""}
-                            </li>
-                        ))}
-                    </ul>
-                </article>
-                <article className="dashboard-card">
-                    <h3>Meat</h3>
-                    <ul>
-                        {inventory.meat.map((item) => (
-                            <li key={item._id}>
-                                {item.name}
-                                {showAdminStock ? ` - Stock ${item.stockQuantity}` : ""}
-                            </li>
-                        ))}
-                    </ul>
-                </article>
+
+            <div className="dashboard-grid bt-dash-grid">
+                {inventorySections.map((section) => (
+                    <article className="dashboard-card bt-dash-panel" key={section.key}>
+                        <h3>{section.title}</h3>
+                        <ul className="bt-dash-list">
+                            {section.items.map((item) => (
+                                <li key={item._id}>
+                                    <span>{item.name}</span>
+                                    {showAdminStock && <span className="bt-dash-stock">Stock {item.stockQuantity}</span>}
+                                </li>
+                            ))}
+                        </ul>
+                    </article>
+                ))}
             </div>
 
-            <article className="dashboard-card user-orders-card">
+            <article className="dashboard-card user-orders-card bt-dash-orders">
                 <h3>My Orders</h3>
                 {!myOrders.length && <p>No orders yet. Place your first custom pizza.</p>}
                 {myOrders.length > 0 && (
                     <ul className="user-orders-list">
                         {myOrders.map((order) => (
                             <li key={order._id}>
-                                <strong>#{order._id.slice(-8)}</strong>
+                                <strong className="bt-order-id">#{order._id.slice(-8)}</strong>
                                 <span>{order.pizzaConfig?.base} / {order.pizzaConfig?.sauce} / {order.pizzaConfig?.cheese}</span>
                                 <span>Status: <b>{order.status || "Order Received"}</b></span>
                                 <span>Payment: {order.paymentStatus || "Pending"}</span>

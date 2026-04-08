@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useRef } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { verifyEmail } from "../services/authService";
 
@@ -8,6 +8,7 @@ const VerifyEmailPage = () => {
     const token = useMemo(() => searchParams.get("token") || paramToken || "", [searchParams, paramToken]);
     const [status, setStatus] = useState("loading");
     const [message, setMessage] = useState("Verifying your email...");
+    const hasCalled = useRef(false);
 
     useEffect(() => {
         const run = async () => {
@@ -17,13 +18,20 @@ const VerifyEmailPage = () => {
                 return;
             }
 
+            if (hasCalled.current) return;
+            hasCalled.current = true;
+
             try {
                 const response = await verifyEmail(token);
                 setStatus("success");
                 setMessage(response.message || "Email verified successfully.");
             } catch (error) {
                 setStatus("error");
-                setMessage(error.message || "Email verification failed.");
+                setMessage(
+                    error.message === "Invalid or expired verification token"
+                        ? "Verification failed. The token may be invalid, expired, or your email has already been verified."
+                        : error.message || "Email verification failed."
+                );
             }
         };
 
@@ -31,7 +39,7 @@ const VerifyEmailPage = () => {
     }, [token]);
 
     return (
-        <div className="auth-page-shell">
+        <div className="auth-page-shell bt-login">
             <section className="auth-page-hero">
                 <p className="auth-page-kicker">Pizza Delivery</p>
                 <h1>Email Verification</h1>
